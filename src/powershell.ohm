@@ -1,0 +1,27 @@
+// An Ohm grammar for arithmetic expressions.
+// This taken directly from the [math example](https://github.com/ohmjs/ohm/blob/main/examples/math/index.html).
+PowerShell {
+  Script = Statement+
+
+  Statement = Expression ";"  --expression
+    | identifier "=" Expression+ ";"           --assignment
+
+  Expression = Expression Operator Expression			--binary
+    | strlit
+    | floatlit
+    | intlit
+    | true
+    | false
+    
+  Operator = "+" | "-" | "/" | "%" | "*" | "-eq" | "&&" 
+
+  print = "print" ~alnum
+  true = "true" ~alnum
+  false = "false" ~alnum
+  identifier = "$" alnum+
+
+  intlit = digit+
+  floatlit = digit+ "." digit+
+  strlit = "\"" char* "\""
+  char = ~"\"" ~"\n" any
+}
