@@ -1,8 +1,15 @@
-PowerShell {
-  input:
-    input-element+
+/*
+  This grammar is partially based on the Windows PowerShell Language Specification (https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-02)
+  and Ohm library's Ecmascript example in https://github.com/ohmjs/ohm/examples/ecmascript/src/es5.ohm.
 
-  input-element
+  Ohm Library has an MIT License.
+*/
+
+PowerShell {
+  input =
+    inputElement+
+
+  inputElement
     = whitespace | token
 
   space := whitespace | lineTerminator
@@ -22,14 +29,14 @@ PowerShell {
 
   token = reservedWord
     | variable
-    | command
-    | command-parameter
-    | command-argument-token
-    | integer-literal
-    | real-literal
-    | string-literal
-    | type-literal
-    | operator-or-punctuator
+    // | command
+    // | commandParameter
+    // | commandArgumentToken
+    | integerLiteral
+    | realLiteral
+    | stringLiteral
+    // | typeLiteral
+    | applySyntactic<OperatorExpression>
 
   variable = ~reservedWord identifierName
   identifierName = identifierStart identifierPart
@@ -49,47 +56,102 @@ PowerShell {
     | trap           | try            | until       | using
     | var            | while          | workflow
 
+  begin = "begin" ~identifierPart
+  break = "break" ~identifierPart
+  catch = "catch" ~identifierPart
+  class = "class" ~identifierPart
+  continue = "continue" ~identifierPart
+  data = "data" ~identifierPart
+  define = "define" ~identifierPart
+  do = "do" ~identifierPart
+  dynamicparam = "dynamicparam" ~identifierPart
+  else = "else" ~identifierPart
+  elseif = "elseif" ~identifierPart
+  end := "end" ~identifierPart
+  exit = "exit" ~identifierPart
+  filter = "filter" ~identifierPart
+  finally = "finally" ~identifierPart
+  for = "for" ~identifierPart
+  from = "from" ~identifierPart
+  foreach = "foreach" ~identifierPart
+  function = "function" ~identifierPart
+  if = "if" ~identifierPart
+  in = "in" ~identifierPart
+  inlinescript = "inlinescript" ~identifierPart
+  parallel = "parallel" ~identifierPart
+  param = "param" ~identifierPart
+  process = "process" ~identifierPart
+  return = "return" ~identifierPart
+  switch = "switch" ~identifierPart
+  throw = "throw" ~identifierPart
+  trap = "trap" ~identifierPart
+  try = "try" ~identifierPart
+  until = "until" ~identifierPart
+  using = "using" ~identifierPart
+  var = "var" ~identifierPart
+  while = "while" ~identifierPart
+  workflow = "workflow" ~identifierPart
+
   booleanLiteral = ("true" | "false") ~identifierPart
   nullLiteral = "null" ~identifierPart
 
-  integer-literal =
-    decimal-integer-literal
-    // hexadecimal-integer-literal
+  integerLiteral =
+    decimalIntegerLiteral
+    // hexadecimalIntegerLiteral
 
-  decimal-integer-literal = decimal-digit+ numeric-type-suffix* numeric-multiplier*
+  decimalIntegerLiteral = decimalDigit+ numericTypeSuffix* numericMultiplier*
 
-  decimal-digit = "0".."9"
-  // TODO: optimize decimal-digit with nonzero decimal logic from ES5 spec
+  decimalDigit = "0".."9"
+  // TODO: optimize decimalDigit with nonzero decimal logic from ES5 spec
 
-  numeric-type-suffix =
-    | long-type-suffix
-    | decimal-type-suffix
+  numericTypeSuffix =
+    | longTypeSuffix
+    | decimalTypeSuffix
 
-  decimal-type-suffix = "d"
-  long-type-suffix = "l"
+  decimalTypeSuffix = "d"
+  longTypeSuffix = "l"
 
-  numeric-multiplier = "kb" | "mb" | "gb" | "tb" | "pb"
+  numericMultiplier = "kb" | "mb" | "gb" | "tb" | "pb"
 
-  real-literal =
-    decimal-digit+ ".": decimal-digit+ exponent-part* decimal-type-suffix* numeric-multiplier*
+  realLiteral =
+    decimalDigit+ "." decimalDigit+ exponentPart* decimalTypeSuffix* numericMultiplier*
 
-  exponent-part = "e" sign* decimal-digit+
+  exponentPart = "e" sign* decimalDigit+
 
   sign = "+" | "-"
-  // TODO: may need to account for non-existent sign in exponents
+  // TODO: exponents can have no signs
 
-  string-literal =
-    | expandable-string-literal
+  stringLiteral =
+    | expandableStringLiteral
     // | expandable-here-string-literal // multi-line double-quoted string literal
-    | verbatim-string-literal
+    | verbatimStringLiteral
     // | verbatim-here-string-literal // multi-line single-quoted string literal
 
   // The following follows the ES5 spec closer compared to the PowerShell spec
-  expandable-string-literal = "\"" any "\""
+  expandableStringLiteral = "\"" any "\""
 
-  verbatim-string-literal = "'" any "'"
+  verbatimStringLiteral = "'" any "'"
   // end following
 
-  
+  // TODO: logic for sting templating in expandable-string-literals
 
+
+  // TODO: advanced arithmetic logic from EC5
+  OperatorExpression = OperatorExpression addop Term    --binary
+    | Term
+
+  Term = Term mulop Factor        --binary
+    | Factor
+  
+  Factor = Primary modop Factor   --binary
+    | Primary
+
+  Primary = "(" OperatorExpression ")"    --parens
+    | integerLiteral
+    | realLiteral
+    | variable
+
+  addop   = "+" | "-"
+  mulop   = "*" | "/"
+  modop   = "%"
 }
