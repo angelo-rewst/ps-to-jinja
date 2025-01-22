@@ -32,11 +32,11 @@ PowerShell {
     // | command
     // | commandParameter
     // | commandArgumentToken
+    | applySyntactic<Expression>
     | integerLiteral
     | realLiteral
     | stringLiteral
     // | typeLiteral
-    | applySyntactic<OperatorExpression>
 
   variable = ~reservedWord identifierName
   identifierName = identifierStart identifierPart
@@ -92,6 +92,9 @@ PowerShell {
   while = "while" ~identifierPart
   workflow = "workflow" ~identifierPart
 
+  literal = integerLiteral | realLiteral
+  // TODO: complete all literal types
+
   booleanLiteral = ("true" | "false") ~identifierPart
   nullLiteral = "null" ~identifierPart
 
@@ -139,21 +142,18 @@ PowerShell {
 
 
   // TODO: advanced arithmetic logic from EC5
-  OperatorExpression = OperatorExpression addop Term    --binary
-    | Term
 
-  Term = Term mulop Factor        --binary
-    | Factor
-  
-  Factor = Primary modop Factor   --binary
-    | Primary
+  Expression = AdditiveExpression
 
-  Primary = "(" OperatorExpression ")"    --parens
-    | integerLiteral
-    | realLiteral
-    | variable
+  AdditiveExpression = AdditiveExpression "+" MultiplicativeExpression    --add
+    | AdditiveExpression "-" MultiplicativeExpression                     --sub
+    | MultiplicativeExpression  
 
-  addop   = "+" | "-"
-  mulop   = "*" | "/"
-  modop   = "%"
+  MultiplicativeExpression = MultiplicativeExpression "*" literal         --mul
+    | MultiplicativeExpression "/" literal                                --div
+    | MultiplicativeExpression "%" literal                                --mod
+    | PrimaryExpression
+
+  PrimaryExpression = "(" Expression ")"                                --paren
+    | literal
 }
