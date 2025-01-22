@@ -1,27 +1,95 @@
-// An Ohm grammar for arithmetic expressions.
-// This taken directly from the [math example](https://github.com/ohmjs/ohm/blob/main/examples/math/index.html).
 PowerShell {
-  Script = Statement+
+  input:
+    input-element+
 
-  Statement = Expression ";"  --expression
-    | identifier "=" Expression+ ";"           --assignment
+  input-element
+    = whitespace | token
 
-  Expression = Expression Operator Expression			--binary
-    | strlit
-    | floatlit
-    | intlit
-    | true
-    | false
-    
-  Operator = "+" | "-" | "/" | "%" | "*" | "-eq" | "&&" 
+  space := whitespace | lineTerminator
 
-  print = "print" ~alnum
-  true = "true" ~alnum
-  false = "false" ~alnum
-  identifier = "$" alnum+
+  whitespace = "\t"
+             | "\x0B"    -- verticalTab
+             | "\x0C"    -- formFeed
+             | " "
+             | "\u00A0"  -- noBreakSpace
+             | "\uFEFF"  -- byteOrderMark
+             | unicodeSpaceSeparator
 
-  intlit = digit+
-  floatlit = digit+ "." digit+
-  strlit = "\"" char* "\""
-  char = ~"\"" ~"\n" any
+  lineTerminator = "\n" | "\r" | "\u2028" | "\u2029"
+  lineTerminatorSequence = "\n" | "\r" ~"\n" | "\u2028" | "\u2029" | "\r\n"
+
+  unicodeSpaceSeparator = "\u2000".."\u200B" | "\u3000"
+
+  token = reservedWord
+    | variable
+    | command
+    | command-parameter
+    | command-argument-token
+    | integer-literal
+    | real-literal
+    | string-literal
+    | type-literal
+    | operator-or-punctuator
+
+  variable = ~reservedWord identifierName
+  identifierName = identifierStart identifierPart
+
+  identifierStart = "$"
+  identifierPart = alnum+
+
+  reservedWord = keyword | nullLiteral | booleanLiteral
+
+  keyword = | begin         | break         | catch      | class
+    | continue       | data           | define      | do
+    | dynamicparam   | else           | elseif      | end
+    | exit           | filter         | finally     | for
+    | foreach        | from           | function    | if
+    | in             | inlinescript   | parallel    | param
+    | process        | return         | switch      | throw
+    | trap           | try            | until       | using
+    | var            | while          | workflow
+
+  booleanLiteral = ("true" | "false") ~identifierPart
+  nullLiteral = "null" ~identifierPart
+
+  integer-literal =
+    decimal-integer-literal
+    // hexadecimal-integer-literal
+
+  decimal-integer-literal = decimal-digit+ numeric-type-suffix* numeric-multiplier*
+
+  decimal-digit = "0".."9"
+  // TODO: optimize decimal-digit with nonzero decimal logic from ES5 spec
+
+  numeric-type-suffix =
+    | long-type-suffix
+    | decimal-type-suffix
+
+  decimal-type-suffix = "d"
+  long-type-suffix = "l"
+
+  numeric-multiplier = "kb" | "mb" | "gb" | "tb" | "pb"
+
+  real-literal =
+    decimal-digit+ ".": decimal-digit+ exponent-part* decimal-type-suffix* numeric-multiplier*
+
+  exponent-part = "e" sign* decimal-digit+
+
+  sign = "+" | "-"
+  // TODO: may need to account for non-existent sign in exponents
+
+  string-literal =
+    | expandable-string-literal
+    // | expandable-here-string-literal // multi-line double-quoted string literal
+    | verbatim-string-literal
+    // | verbatim-here-string-literal // multi-line single-quoted string literal
+
+  // The following follows the ES5 spec closer compared to the PowerShell spec
+  expandable-string-literal = "\"" any "\""
+
+  verbatim-string-literal = "'" any "'"
+  // end following
+
+  
+
 }

@@ -16,6 +16,6 @@
   },
   "scripts": {
     "generate": "ohm generateBundles --withTypes 'src/*.ohm'",
-    "test": "npm run generate && node -r ts-node/register src/arithmetic.test.ts"
+    "test": "npm run generate && node -r ts-node/register src/powershell.test.ts"
   }
 }
