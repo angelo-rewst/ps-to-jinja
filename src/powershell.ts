@@ -14,19 +14,32 @@ function check(condition: boolean, message: string, at: any) {
 const semantics: PowerShellSemantics = grammar.createSemantics();
 
 semantics.addOperation<void>('eval()', {
-  Script(statements) {
+  input(statements) {
     for (const statement of statements.children) {
-      statement.eval();
+      return statement.eval();
     }
   },
-  // Statement_assignment(id, _eq, expression, _semicolon) {
-  //   const entity = memory[id.sourceString]
-  //   check(!entity || entity?.type === "NUM", "Cannot assign", id)
-  //   check(!entity || entity?.mutable, `${id.sourceString} not writable`, id)
-  //   memory[id.sourceString] = { type: "NUM", value: expression.eval(), mutable: true }
-  // },
-  // Statement_expression()
+  OperatorExpression_binary(left, op, right) {
+    const [x, y] = [left.eval(), right.eval()];
+    return op.sourceString == "+" ? x + y : x - y;
+  },
+  Term_binary(left, op, right) {
+    const [x, o, y] = [left.eval(), op.sourceString, right.eval()];
+    return o == "*" ? x * y : x / y;
+  },
+  Primary_parens(_arg0, arg1, _arg2) {
+    return arg1.eval();
+  },
+  integerLiteral(_arg0) {
+    console.log('log', this.sourceString);
+    // return new IntegerLiteral(arg0.eval());
+    return parseInt(this.sourceString);
+  },
+  realLiteral(arg0, arg1, arg2, arg3, arg4, arg5) {
+    return parseFloat(this.sourceString);
+  },
 });
+
 
 export function evaluate(expr: string): number {
   const matchResult = grammar.match(expr);

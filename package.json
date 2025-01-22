@@ -16,6 +16,7 @@
   },
   "scripts": {
     "generate": "ohm generateBundles --withTypes 'src/*.ohm'",
-    "test": "npm run generate && node -r ts-node/register src/powershell.test.ts"
+    "test:all": "npm run generate && node -r ts-node/register src/powershell.test.ts",
+    "test": "node -r ts-node/register src/powershell.test.ts"
   }
 }

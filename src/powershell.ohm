@@ -1,13 +1,13 @@
 /*
-  This grammar is partially based on the Windows PowerShell Language Specification (https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-02)
-  and Ohm library's Ecmascript example in https://github.com/ohmjs/ohm/examples/ecmascript/src/es5.ohm.
+  This grammar is partially based on the Windows PowerShell Language Specification (https://learn.microsoft.com/en-us/powershell/scripting/lang-spec/chapter-02),
+  Ohm library's Ecmascript example in https://github.com/ohmjs/ohm/examples/ecmascript/src/es5.ohm,
+  and Ray Toal's Intro to Ohm course (https://cs.lmu.edu/~ray/notes/introohm/).
 
   Ohm Library has an MIT License.
 */
 
 PowerShell {
-  input =
-    inputElement+
+  input = inputElement+
 
   inputElement
     = whitespace | token
@@ -95,11 +95,12 @@ PowerShell {
   booleanLiteral = ("true" | "false") ~identifierPart
   nullLiteral = "null" ~identifierPart
 
-  integerLiteral =
-    decimalIntegerLiteral
-    // hexadecimalIntegerLiteral
+  integerLiteral = 
+    decimalDigit+
+    // decimalIntegerLiteral // powershell spec
+    // | hexadecimalIntegerLiteral
 
-  decimalIntegerLiteral = decimalDigit+ numericTypeSuffix* numericMultiplier*
+  // decimalIntegerLiteral = decimalDigit+ numericTypeSuffix* numericMultiplier*
 
   decimalDigit = "0".."9"
   // TODO: optimize decimalDigit with nonzero decimal logic from ES5 spec
@@ -114,11 +115,12 @@ PowerShell {
   numericMultiplier = "kb" | "mb" | "gb" | "tb" | "pb"
 
   realLiteral =
-    decimalDigit+ "." decimalDigit+ exponentPart* decimalTypeSuffix* numericMultiplier*
+    digit+ ("." digit+)? (("E" | "e") ("+" | "-")? digit+)?
+    // decimalDigit+ "." decimalDigit+ exponentPart* decimalTypeSuffix* numericMultiplier* // based on powershell spec
 
-  exponentPart = "e" sign* decimalDigit+
+  // exponentPart = "e" sign* decimalDigit+
 
-  sign = "+" | "-"
+  // sign = "+" | "-"
   // TODO: exponents can have no signs
 
   stringLiteral =
