@@ -30,11 +30,11 @@ semantics.addOperation<void>('eval()', {
   LogicalORExpression_lor(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
     
-    return x || y;
+    return `${x} || ${y}`;
   },
   LogicalANDExpression_land(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
-    return x && y;
+    return `${x} && ${y}`;
   },
   EqualityExpression_eq(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
@@ -52,19 +52,19 @@ semantics.addOperation<void>('eval()', {
   },
   AdditiveExpression_sub(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
-    return x - y;
+    return `${x} - ${y}`;
   },
   MultiplicativeExpression_mul(left, op, right) {
     const [x, o, y] = [left.eval(), op.sourceString, right.eval()];
-    return x * y;
+    return `${x} * ${y}`;
   },
   MultiplicativeExpression_div(left, op, right) {
     const [x, o, y] = [left.eval(), op.sourceString, right.eval()];
-    return x / y;
+    return `${x} / ${y}`;
   },
   MultiplicativeExpression_mod(left, op, right) {
     const [x, o, y] = [left.eval(), op.sourceString, right.eval()];
-    return x % y;
+    return `${x} % ${y}`;
   },
   integerLiteral(_arg0) {
     // return new IntegerLiteral(arg0.eval());
@@ -78,7 +78,7 @@ semantics.addOperation<void>('eval()', {
   },
   AssignmentExpression_assignment(leftSide, assign, rightSide) {
     
-    jinja += `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
+    // jinja += `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
     return `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
   },
   CallExpression_propRefExp(arg0, arg1, arg2) {
@@ -168,19 +168,10 @@ semantics.addOperation<void>('eval()', {
 
     templ += `{% endif %}`;
 
-//     jinja += `{% if ${arg2.eval()} %}
-//     ${arg4.eval()}
-// {% else %} 
-//     ${arg6.eval()}
-// {% endif %}`;
+
 jinja += templ;
   },
   ElseIfBlock_elifBlock(arg0, arg1, arg2, arg3, arg4) {
-    // console.log('arg0', arg0.sourceString);
-    // console.log('arg1', arg1.sourceString);
-    // console.log('arg2', arg2.sourceString);
-    // console.log('arg3', arg3.sourceString);
-    // console.log('arg4', arg4.sourceString);
 
     return `{% elif ${arg2.eval()} %}
 ${arg4.eval()}
