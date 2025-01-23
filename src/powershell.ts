@@ -78,8 +78,8 @@ semantics.addOperation<void>('eval()', {
   },
   AssignmentExpression_assignment(leftSide, assign, rightSide) {
     
-    jinja += `{{ set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} }}\n`;
-    return `{{ set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} }}\n`;
+    jinja += `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
+    return `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
   },
   CallExpression_propRefExp(arg0, arg1, arg2) {
     return `${arg0.eval()}.${arg2.eval()}`
@@ -151,17 +151,19 @@ semantics.addOperation<void>('eval()', {
     
     return statement.eval();
   },
-  IfStatement_ifStmt(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
-    // console.log('condition', arg2.sourceString);
-    // console.log('block1', arg4.sourceString);
-    console.log('block2', arg6.sourceString);
+  IfStatement_ifStmt(arg0, arg1, condition, arg3, ifBlock, elifBlock, arg6, elseBlock) {
+    console.log('elifBlock', elifBlock.sourceString);
 
-    let templ = `{% if ${arg2.eval()} %}
-    ${arg4.eval()}`
+    let templ = `{% if ${condition.eval()} %}
+    ${ifBlock.eval()}`
 
-    if (arg6.sourceString !== '') {
+    if (elifBlock.sourceString !== '') {
+      templ += `${elifBlock.eval()}`
+    }
+
+    if (elseBlock.sourceString !== '') {
       templ += `{% else %} 
-    ${arg6.eval()}`
+    ${elseBlock.eval()}`
     }
 
     templ += `{% endif %}`;
@@ -172,6 +174,17 @@ semantics.addOperation<void>('eval()', {
 //     ${arg6.eval()}
 // {% endif %}`;
 jinja += templ;
+  },
+  ElseIfBlock_elifBlock(arg0, arg1, arg2, arg3, arg4) {
+    // console.log('arg0', arg0.sourceString);
+    // console.log('arg1', arg1.sourceString);
+    // console.log('arg2', arg2.sourceString);
+    // console.log('arg3', arg3.sourceString);
+    // console.log('arg4', arg4.sourceString);
+
+    return `{% elif ${arg2.eval()} %}
+${arg4.eval()}
+    `;
   },
   else(arg0) {
     console.log('else', arg0.sourceString);

@@ -217,7 +217,9 @@ PowerShell {
 
   StatementList = Statement*
 
-  IfStatement = if "(" Expression ")" Block (else Block)?             --ifStmt
+  IfStatement = if "(" Expression ")" Block (ElseIfBlock)* (else Block)?      --ifStmt
+
+  ElseIfBlock = elseif "(" Expression ")" Block                               --elifBlock
 
   IterationStatement = foreach "(" variable in variable ")" Block             -- forIn
 }

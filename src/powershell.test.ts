@@ -84,6 +84,10 @@ if ($ctx.result -eq True) {
   result = evaluate(`
 if ($ctx.result -eq True) {
     Write-Var $show
+} elseif (True) {
+    $e = 4
+} elseif (True) {
+    $e = 4
 } else {
     Write-String "<h1>Message</h1>"
 }
