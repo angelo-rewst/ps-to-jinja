@@ -71,6 +71,16 @@ Write-String "</ul>"\n
 
 //   console.log('result:\n', result);
 
+  /*
+
+if ($ctx.result -eq True) {
+    Write-Var $show
+} else {
+    Write-String "<h1>Message</h1>"
+}
+
+  */
+  
   result = evaluate(`
 if ($ctx.result -eq True) {
     Write-Var $show
@@ -81,13 +91,6 @@ if ($ctx.result -eq True) {
 
   console.log('result:\n', result);
 
-//   assert.is(result,
-//     `
-// {{ set x = CTX.json }}\n
-// {{ set counter = 0 }}\n
-// <ul>
-//     `.trim()
-//   );
 
 });
 

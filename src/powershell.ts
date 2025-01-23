@@ -154,13 +154,24 @@ semantics.addOperation<void>('eval()', {
   IfStatement_ifStmt(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
     // console.log('condition', arg2.sourceString);
     // console.log('block1', arg4.sourceString);
-    // console.log('block2', arg6.sourceString);
+    console.log('block2', arg6.sourceString);
 
-    jinja += `{% if ${arg2.eval()} %}
-    ${arg4.eval()}
-{% else %} 
-    ${arg6.eval()}
-{% endif %}`;
+    let templ = `{% if ${arg2.eval()} %}
+    ${arg4.eval()}`
+
+    if (arg6.sourceString !== '') {
+      templ += `{% else %} 
+    ${arg6.eval()}`
+    }
+
+    templ += `{% endif %}`;
+
+//     jinja += `{% if ${arg2.eval()} %}
+//     ${arg4.eval()}
+// {% else %} 
+//     ${arg6.eval()}
+// {% endif %}`;
+jinja += templ;
   },
   else(arg0) {
     console.log('else', arg0.sourceString);
