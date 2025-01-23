@@ -6,6 +6,7 @@ const constants: { [name: string]: number } = {
 };
 
 const memory: any = {};
+let jinja: string = '';
 
 function check(condition: boolean, message: string, at: any) {
   if (!condition) throw new Error(`${at.source.getLineAndColumnMessage()}${message}`)
@@ -16,13 +17,16 @@ const semantics: PowerShellSemantics = grammar.createSemantics();
 semantics.addOperation<void>('eval()', {
   input(statements) {
     for (const statement of statements.children) {
-      return statement.eval();
+      statement.eval();
     }
+    return jinja;
   },
   Expression(arg0) {
+    console.log('Expression ', arg0.sourceString);
     return arg0.eval();
   },
   PrimaryExpression_paren(arg0, arg1, arg2) {
+    console.log('PrimaryExpression_paren ', arg1.sourceString);
     return arg1.eval();
   },
   LogicalORExpression_lor(left, arg1, right) {
@@ -72,16 +76,25 @@ semantics.addOperation<void>('eval()', {
   booleanLiteral(arg0) {
     return this.sourceString == "True" ? true : false;
   },
-  AssignmentExpression_assignment(leftSide, _assign, rightSide) {
-    // const entity = memory[this.sourceString];
-    // memory[leftSide] = { variable: leftSide.eval(), value: rightSide.eval() }
-    memory[leftSide.eval()] = rightSide.eval();
+  AssignmentExpression_assignment(leftSide, assign, rightSide) {
+    console.log('AssignmentExpression_assignment ', this.sourceString);
+    
+    jinja += `{{ set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} }}\n`;
+    return `{{ set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} }}\n`;
+  },
+  CallExpression_propRefExp(arg0, arg1, arg2) {
+    console.log('CallExpression_propRefExp ', this.sourceString);
+    return `${arg0.eval()}.${arg2.eval()}`
   },
   variable_call(_arg0) {
-    const entity = memory[this.sourceString];
-    if (entity) { // variable
-      return entity;
+    // const entity = memory[this.sourceString];
+    const identifier = this.sourceString;
+    if (identifier == '$ctx') { // context variable
+      return identifier.slice(1).toUpperCase();
     }
+    return identifier.slice(1); // remove $ sign
+  },
+  identifierPart(arg0) {
     return this.sourceString;
   },
 });

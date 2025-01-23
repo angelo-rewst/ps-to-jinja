@@ -148,8 +148,10 @@ PowerShell {
   Expression = AssignmentExpression
 
   AssignmentExpression
-    = variable "=" LogicalORExpression                                    --assignment
-    | LogicalORExpression
+    = CallExpression "=" LogicalANDExpression                                    --assignment
+    | LogicalANDExpression
+  
+  // RightSideOperation = variable | LogicalORExpression
 
   LogicalORExpression = LogicalORExpression orop LogicalANDExpression     --lor
     | LogicalANDExpression
@@ -174,6 +176,11 @@ PowerShell {
   MultiplicativeExpression = MultiplicativeExpression "*" literal         --mul
     | MultiplicativeExpression "/" literal                                --div
     | MultiplicativeExpression "%" literal                                --mod
+    | CallExpression
+
+  CallExpression = CallExpression "[" (integerLiteral | variable) "]"     --arrayRefExp
+    | CallExpression "." identifierPart                                   --propRefExp
+    // | CallExpression Arguments                                         --callExpExp
     | PrimaryExpression
 
   PrimaryExpression = "(" Expression ")"                                --paren
