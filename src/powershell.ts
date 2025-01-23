@@ -22,11 +22,9 @@ semantics.addOperation<void>('eval()', {
     return jinja;
   },
   Expression(arg0) {
-    console.log('Expression ', arg0.sourceString);
     return arg0.eval();
   },
   PrimaryExpression_paren(arg0, arg1, arg2) {
-    console.log('PrimaryExpression_paren ', arg1.sourceString);
     return arg1.eval();
   },
   LogicalORExpression_lor(left, arg1, right) {
@@ -77,13 +75,11 @@ semantics.addOperation<void>('eval()', {
     return this.sourceString == "True" ? true : false;
   },
   AssignmentExpression_assignment(leftSide, assign, rightSide) {
-    console.log('AssignmentExpression_assignment ', this.sourceString);
     
     jinja += `{{ set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} }}\n`;
     return `{{ set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} }}\n`;
   },
   CallExpression_propRefExp(arg0, arg1, arg2) {
-    console.log('CallExpression_propRefExp ', this.sourceString);
     return `${arg0.eval()}.${arg2.eval()}`
   },
   variable_call(_arg0) {
@@ -97,8 +93,52 @@ semantics.addOperation<void>('eval()', {
   identifierPart(arg0) {
     return this.sourceString;
   },
+  expandableStringLiteral(arg0, arg1, arg2) {
+    return `\"${arg1.sourceString}\"`;
+  },
+  CommandExpression_commandExp(arg0, arg1) {
+    const command = arg0.sourceString;
+    const parameters = arg1.eval();
+    
+    if (command === 'Write-Host') { // TODO: change this to switch
+      jinja += WriteHostCommand(parameters);
+    }
+  },
+  CommandParameter(arg0) {
+    return arg0.eval();
+  },
+  CommandParameter_commandParamExp(arg0) {
+    return arg0.eval();
+  },
+  CommandParameter_commandParam(arg0) {
+    
+    return arg0.eval();
+  },
+  _iter(...children) {
+    const res = [];
+    let i = 0;
+    for (const child of children) {
+      res[i] = child.eval();
+      i ++;
+    }
+    return res;
+  },
 });
 
+// TODO: move out to a different file
+function WriteHostCommand(parameters: any) {
+  if(parameters) {
+    return parameters.reduce((arr: string, curr: string) => {
+      if (curr.match(/".*?"/g)) {
+        arr += curr.slice(1, -1);
+      } else {
+        arr += curr;
+      }
+      return arr;
+    }, "");
+  }
+  return '';
+}
 
 export function evaluate(expr: string): number {
   const matchResult = grammar.match(expr);

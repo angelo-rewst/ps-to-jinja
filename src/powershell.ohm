@@ -93,7 +93,7 @@ PowerShell {
   while = "while" ~identifierPart
   workflow = "workflow" ~identifierPart
 
-  literal = integerLiteral | realLiteral | booleanLiteral
+  literal = integerLiteral | realLiteral | booleanLiteral | stringLiteral
   // TODO: complete all literal types
 
   //booleanLiteral = ("true" | "false") ~identifierPart
@@ -135,9 +135,16 @@ PowerShell {
     // | verbatim-here-string-literal // multi-line single-quoted string literal
 
   // The following follows the ES5 spec closer compared to the PowerShell spec
-  expandableStringLiteral = "\"" any "\""
+  // expandableStringLiteral = "\"" any* "\""
 
-  verbatimStringLiteral = "'" any "'"
+  char        =  escape
+              |  ~"\\" ~"\"" ~"'" ~"\n" any
+              
+  escape      =  "\\\\" | "\\\"" | "\\'" | "\\n" | "\\t"
+  
+  expandableStringLiteral   =  "\"" (char | "\'")* "\""
+
+  verbatimStringLiteral = "'" any* "'"
   // end following
 
   // TODO: logic for sting templating in expandable-string-literals
@@ -180,10 +187,22 @@ PowerShell {
 
   CallExpression = CallExpression "[" (integerLiteral | variable) "]"     --arrayRefExp
     | CallExpression "." identifierPart                                   --propRefExp
-    // | CallExpression Arguments                                         --callExpExp
+    | CommandExpression                                                   --commandExp
     | PrimaryExpression
 
-  PrimaryExpression = "(" Expression ")"                                --paren
+  CommandExpression
+    = CommandName CommandParameter+                                       --commandExp
+    | PrimaryExpression
+  
+  CommandParameter = PrimaryExpression                                    --commandParamExp
+    | ParameterName                                                       --commandParam
+
+  CommandName
+    = "Write-Host"                                                        --writeHostCmd
+
+  ParameterName = "-" identifierPart
+
+  PrimaryExpression = "(" Expression ")"                                  --paren
     | literal
     | variable
 }

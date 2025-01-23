@@ -57,15 +57,20 @@ test('basic', () => {
     Write-Host "</ul>"
 
   */
+
   result = evaluate(`
 $x = $ctx.json\n
-$counter= 0
+$counter= 0\n
+Write-Host "<ul>"
   `.trim());
+
   console.log('result:\n', result);
+
   assert.is(result,
     `
 {{ set x = CTX.json }}\n
-{{ set counter = 0 }}
+{{ set counter = 0 }}\n
+<ul>
     `.trim()
   );
 
