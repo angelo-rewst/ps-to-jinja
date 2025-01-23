@@ -210,11 +210,14 @@ PowerShell {
 
   Statement = Block
     | Expression
+    | IfStatement
     | IterationStatement
 
   Block = "{" StatementList "}"
 
   StatementList = Statement*
+
+  IfStatement = if "(" Expression ")" Block (else Block)?             --ifStmt
 
   IterationStatement = foreach "(" variable in variable ")" Block             -- forIn
 }

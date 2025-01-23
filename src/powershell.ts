@@ -38,7 +38,8 @@ semantics.addOperation<void>('eval()', {
   },
   EqualityExpression_eq(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
-    return x === y;
+    
+    return `${x} == ${y}`
   },
   EqualityExpression_ne(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
@@ -110,15 +111,17 @@ semantics.addOperation<void>('eval()', {
       
       return "{{ " + arg1.eval() + " }}\n";
     } else if (command == "Write-String") {
-      jinja += arg1.sourceString.slice(1, -1) + "\n";
-      return arg1.eval();
+      // console.log('Write-String', arg1.sourceString);
+      // jinja += arg1.sourceString.slice(1, -1) + "\n";
+      const strlit = arg1.eval();
+      return strlit.slice(1, -1) + "\n";
     }
   },
   CommandParameter(arg0) {
     return arg0.eval();
   },
   CommandParameter_commandParamLit(arg0) {
-    console.log('CommandParameter_commandParamLit', arg0.sourceString);
+    // console.log('CommandParameter_commandParamLit', arg0.sourceString);
     return arg0.sourceString;
   },
   CommandParameter_commandParam(arg0) {
@@ -147,12 +150,27 @@ semantics.addOperation<void>('eval()', {
   Block(arg0, statement, arg2) {
     
     return statement.eval();
-  }
+  },
+  IfStatement_ifStmt(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
+    // console.log('condition', arg2.sourceString);
+    // console.log('block1', arg4.sourceString);
+    // console.log('block2', arg6.sourceString);
+
+    jinja += `{% if ${arg2.eval()} %}
+    ${arg4.eval()}
+{% else %} 
+    ${arg6.eval()}
+{% endif %}`;
+  },
+  else(arg0) {
+    console.log('else', arg0.sourceString);
+  },
 });
 
 
 
-export function evaluate(expr: string): number {
+export function evaluate(expr: string): string {
+  jinja = '';
   const matchResult = grammar.match(expr);
   return semantics(matchResult).eval();
 }

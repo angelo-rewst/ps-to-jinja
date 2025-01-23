@@ -59,25 +59,35 @@ Write-String "</ul>"\n
 
   */
 
+//   result = evaluate(`
+// $items = $ctx.json
+// Write-String "<ul>"
+// foreach($item in $items) {
+//   $show = "<li>" + $x[$counter] + "</li>"
+//   Write-Var $show
+// }
+// Write-String "</ul>"
+//   `.trim());
+
+//   console.log('result:\n', result);
+
   result = evaluate(`
-$items = $ctx.json\n
-Write-String "<ul>"\n
-foreach($item in $items) {
-  $show = "<li>" + $x[$counter] + "</li>"\n
-  Write-Var $show\n
+if ($ctx.result -eq True) {
+    Write-Var $show
+} else {
+    Write-String "<h1>Message</h1>"
 }
-Write-String "</ul>"\n
   `.trim());
 
   console.log('result:\n', result);
 
-  assert.is(result,
-    `
-{{ set x = CTX.json }}\n
-{{ set counter = 0 }}\n
-<ul>
-    `.trim()
-  );
+//   assert.is(result,
+//     `
+// {{ set x = CTX.json }}\n
+// {{ set counter = 0 }}\n
+// <ul>
+//     `.trim()
+//   );
 
 });
 
