@@ -72,21 +72,21 @@ semantics.addOperation<void>('eval()', {
   booleanLiteral(arg0) {
     return this.sourceString == "True" ? true : false;
   },
+  AssignmentExpression_assignment(leftSide, _assign, rightSide) {
+    // const entity = memory[this.sourceString];
+    console.log('left', this.sourceString);
+    // memory[leftSide] = { variable: leftSide.eval(), value: rightSide.eval() }
+    memory[leftSide.eval()] = rightSide.eval();
+  },
+  variable_call(_arg0) {
+    const entity = memory[this.sourceString];
+    if (entity) { // variable
+      return entity;
+    }
+    return this.sourceString;
+  },
 });
 
-class BinaryExpression {
-  left: any;
-  op: string;
-  right: any;
-  constructor(left: any, op: string, right: any) {
-    this.left = left;
-    this.op = op;
-    this.right = right;
-  }
-  toString() {
-    
-  }
-}
 
 export function evaluate(expr: string): number {
   const matchResult = grammar.match(expr);

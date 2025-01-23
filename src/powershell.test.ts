@@ -46,13 +46,12 @@ test('basic', () => {
   result = evaluate('4 != 2');
   assert.is(result, true);
 
-  // result = evaluate('4 -eq 4');
-  // assert.is(result, true);
+  evaluate('$a = 2');
+  // result = evaluate('$x');
+  // assert.is(result, 2);
 
   // result = evaluate('3 -eq false');
   // assert.is(result, false);
-
-  // assert.is(evaluate('pi;'), Math.PI);
 });
 
 test.run();

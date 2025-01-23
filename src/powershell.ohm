@@ -38,7 +38,7 @@ PowerShell {
     | stringLiteral
     // | typeLiteral
 
-  variable = ~reservedWord identifierName
+  variable = ~reservedWord identifierName                   --call
   identifierName = identifierStart identifierPart
 
   identifierStart = "$"
@@ -144,7 +144,12 @@ PowerShell {
 
   // TODO: advanced arithmetic logic from EC5
 
-  Expression = LogicalORExpression
+  Expression = AssignmentExpression
+
+  AssignmentExpression
+    = AssignmentExpression "=" LogicalORExpression                                    --assignment
+    | variable
+    | LogicalORExpression
 
   LogicalORExpression = LogicalORExpression orop LogicalANDExpression     --lor
     | LogicalANDExpression
@@ -173,4 +178,5 @@ PowerShell {
 
   PrimaryExpression = "(" Expression ")"                                --paren
     | literal
+    | variable
 }
