@@ -27,12 +27,13 @@ PowerShell {
 
   unicodeSpaceSeparator = "\u2000".."\u200B" | "\u3000"
 
-  token = reservedWord
-    | variable
+  token = 
     // | command
     // | commandParameter
     // | commandArgumentToken
-    | applySyntactic<Expression>
+    applySyntactic<Expression>
+    | reservedWord
+    | variable
     | integerLiteral
     | realLiteral
     | stringLiteral
@@ -147,8 +148,7 @@ PowerShell {
   Expression = AssignmentExpression
 
   AssignmentExpression
-    = AssignmentExpression "=" LogicalORExpression                                    --assignment
-    | variable
+    = variable "=" LogicalORExpression                                    --assignment
     | LogicalORExpression
 
   LogicalORExpression = LogicalORExpression orop LogicalANDExpression     --lor

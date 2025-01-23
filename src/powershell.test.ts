@@ -46,9 +46,10 @@ test('basic', () => {
   result = evaluate('4 != 2');
   assert.is(result, true);
 
-  evaluate('$a = 2');
-  // result = evaluate('$x');
-  // assert.is(result, 2);
+  evaluate('$x = 2');
+  result = evaluate('$x');
+  
+  assert.is(result, 2);
 
   // result = evaluate('3 -eq false');
   // assert.is(result, false);

@@ -74,7 +74,6 @@ semantics.addOperation<void>('eval()', {
   },
   AssignmentExpression_assignment(leftSide, _assign, rightSide) {
     // const entity = memory[this.sourceString];
-    console.log('left', this.sourceString);
     // memory[leftSide] = { variable: leftSide.eval(), value: rightSide.eval() }
     memory[leftSide.eval()] = rightSide.eval();
   },
