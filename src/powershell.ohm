@@ -43,7 +43,7 @@ PowerShell {
   identifierName = identifierStart identifierPart
 
   identifierStart = "$"
-  identifierPart = alnum+
+  identifierPart = (alnum | "_" )+
 
   reservedWord = keyword | nullLiteral
 
@@ -155,15 +155,25 @@ PowerShell {
   Expression = AssignmentExpression
 
   AssignmentExpression
-    = CallExpression "=" LogicalANDExpression                             --assignment
-    | LogicalANDExpression
+    = CallExpression assignmentOperator InExpression                             --assignment
+    | InExpression
   
+  assignmentOperator = "=" | "+="
+
+  InExpression
+    = InExpression in LogicalORExpression                                --inop
+    | LogicalORExpression
+
   // RightSideOperation = variable | LogicalORExpression
 
   LogicalORExpression = LogicalORExpression orop LogicalANDExpression     --lor
     | LogicalANDExpression
 
-  LogicalANDExpression = LogicalANDExpression andop EqualityExpression     --land
+  LogicalANDExpression = LogicalANDExpression andop BitwiseORExpression     --land
+    | BitwiseORExpression
+
+  BitwiseORExpression
+    = BitwiseORExpression "|" EqualityExpression                          --bor
     | EqualityExpression
 
   EqualityExpression = EqualityExpression eqop AdditiveExpression         --eq
@@ -192,6 +202,7 @@ PowerShell {
 
   CommandExpression
     = CommandName CommandParameter+                                       --commandExp
+    | DefaultCall
     | PrimaryExpression
   
   CommandParameter = literal                                              --commandParamLit
@@ -201,12 +212,26 @@ PowerShell {
   CommandName
     = "Write-Var"                                                         --writeVarCmd
     | "Write-String"                                                      --writeStringCmd
+  
+  DefaultCall
+    = "default(" stringLiteral ")"
 
   ParameterName = "-" identifierPart
+
+  PropertyName = upper letter+
+
+  PropertyAssignment = PropertyName "=" AssignmentExpression ";"
+
+  HashLiteral = "@{" PropertyAssignment* "}"
+
+  // TODO: actually put literal tokens inside the parens
+  ArrayLiteral = "@("  ")"
 
   PrimaryExpression = "(" Expression ")"                                  --paren
     | literal
     | variable
+    | ArrayLiteral
+    | HashLiteral
 
   Statement = Block
     | Expression
@@ -221,5 +246,5 @@ PowerShell {
 
   ElseIfBlock = elseif "(" Expression ")" Block                               --elifBlock
 
-  IterationStatement = foreach "(" variable in variable ")" Block             -- forIn
+  IterationStatement = foreach "(" variable in CallExpression ")" Block             -- forIn
 }

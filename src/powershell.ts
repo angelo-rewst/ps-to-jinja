@@ -25,7 +25,7 @@ semantics.addOperation<void>('eval()', {
     return arg0.eval();
   },
   PrimaryExpression_paren(arg0, arg1, arg2) {
-    return arg1.eval();
+    return `(${arg1.eval()})`;
   },
   LogicalORExpression_lor(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
@@ -35,6 +35,10 @@ semantics.addOperation<void>('eval()', {
   LogicalANDExpression_land(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
     return `${x} && ${y}`;
+  },
+  BitwiseORExpression_bor(left, arg1, right) {
+    const [x, y] = [left.eval(), right.eval()];
+    return `${x} | ${y}`;
   },
   EqualityExpression_eq(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
@@ -77,9 +81,16 @@ semantics.addOperation<void>('eval()', {
     return this.sourceString == "True" ? true : false;
   },
   AssignmentExpression_assignment(leftSide, assign, rightSide) {
-    
-    // jinja += `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
-    return `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
+    const templ = `{% set ${leftSide.eval()} ${assign.sourceString} ${rightSide.eval()} %}\n`;
+    jinja += templ;
+    return templ;
+  },
+  ArrayLiteral(arg0, arg1) {
+    console.log('arg1', this.sourceString);
+    return "[]"; // actualy functionality
+  },
+  HashLiteral(arg0, arg1, arg2) {
+    return `{\n${arg1.eval()}}`;
   },
   CallExpression_propRefExp(arg0, arg1, arg2) {
     return `${arg0.eval()}.${arg2.eval()}`
@@ -167,9 +178,7 @@ semantics.addOperation<void>('eval()', {
     }
 
     templ += `{% endif %}`;
-
-
-jinja += templ;
+    jinja += templ;
   },
   ElseIfBlock_elifBlock(arg0, arg1, arg2, arg3, arg4) {
 
@@ -177,12 +186,24 @@ jinja += templ;
 ${arg4.eval()}
     `;
   },
+  PropertyAssignment(arg0, arg1, arg2, arg3) {
+    return `"${arg0.eval()}": ${arg2.eval()},\n`
+  },
+  PropertyName(arg0, arg1) {
+    return `${arg0.sourceString.toLowerCase()}${camelToSnakeCase(arg1.sourceString)}`;
+  },
+  DefaultCall(arg0, arg1, arg2) {
+    return `default("${arg1.sourceString}")`;
+  },
+  InExpression_inop(arg0, arg1, arg2) {
+    return `${arg0.eval()} in ${arg2.eval()}`;
+  },
   else(arg0) {
     console.log('else', arg0.sourceString);
   },
 });
 
-
+const camelToSnakeCase = (str: string) => str.replace(/[A-Z]/g, (letter: string )=> `_${letter.toLowerCase()}`);
 
 export function evaluate(expr: string): string {
   jinja = '';

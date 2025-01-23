@@ -81,19 +81,80 @@ if ($ctx.result -eq True) {
 
   */
   
-  result = evaluate(`
-if ($ctx.result -eq True) {
-    Write-Var $show
-} elseif (True) {
-    $e = 4
-} elseif (True) {
-    $e = 4
-} else {
-    Write-String "<h1>Message</h1>"
-}
-  `.trim());
+//   result = evaluate(`
+// if ($ctx.result -eq True) {
+//     Write-Var $show
+// } elseif (True) {
+//     $e = 4
+// } elseif (True) {
+//     $e = 4
+// } else {
+//     Write-String "<h1>Message</h1>"
+// }
+//   `.trim());
 
-  console.log('result:\n', result);
+//   console.log('result:\n', result);
+/*
+    $array = @()
+    $counter = 0
+    foreach ($user in $ctx.company_data.users) {
+      $array[$counter] = @{
+        UserId = $user.user_id;
+        FullName = $user.first_name + " " + $user.last_name;
+        Email = $user.email | default("Unknown");
+        IsActive = $user.is_active;
+        LastLogin = $user.last_login | default("Never");
+        IsInternal = "clucktoso.com" in ($user.email | default(""));
+      }
+      $counter += 1
+    }
+    Write-Var $array
+*/
+
+  result = evaluate(`
+    $array = @()
+    $counter = 0
+    foreach ($user in $ctx.company_data.users) {
+      $array[$counter] = @{
+        UserId = $user.user_id;
+        FullName = $user.first_name + " " + $user.last_name;
+        Email = $user.email | default("Unknown");
+        IsActive = $user.is_active;
+        LastLogin = $user.last_login | default("Never");
+        IsInternal = "clucktoso.com" in ($user.email | default(""));
+      }
+      $counter += 1
+    }
+    Write-Var $array
+      `.trim());
+    
+      console.log('result:\n', result);
+  /*
+
+  {{
+    [
+        {
+            "user_id": user.user_id,
+            "full_name": user.first_name ~ " " ~ user.last_name,
+            "email": user.email | default("Unknown"),
+            "is_active": user.is_active,
+            "last_login": user.last_login | default("Never"),
+            "is_internal": "clucktoso.com" in (user.email | default("")),
+            "role": (
+                [detail.role for detail in CTX.company_data.user_details if detail.user_id == user.user_id] | first | default("Unknown")
+            ),
+            "department": (
+                [detail.department for detail in CTX.company_data.user_details if detail.user_id == user.user_id] | first | default("Unknown")
+            ),
+            "salary": (
+                [detail.salary for detail in CTX.company_data.user_details if detail.user_id == user.user_id] | first | default(0)
+            )
+        }
+        for user in CTX.company_data.users
+    ]
+  }}
+
+   */
 
 
 });
