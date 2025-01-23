@@ -47,7 +47,7 @@ semantics.addOperation<void>('eval()', {
   },
   AdditiveExpression_add(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
-    return x + y;
+    return `${x} + ${y}`;
   },
   AdditiveExpression_sub(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
@@ -98,21 +98,28 @@ semantics.addOperation<void>('eval()', {
     return this.sourceString;
   },
   expandableStringLiteral(arg0, arg1, arg2) {
+    console.log('expandableStringLiteral', arg1.sourceString);
+    
     return `\"${arg1.sourceString}\"`;
   },
   CommandExpression_commandExp(arg0, arg1) {
     const command = arg0.sourceString;
-    const parameters = arg1.eval();
+    // const parameters = arg1.eval();
     
-    if (command === 'Write-Host') { // TODO: change this to switch
-      jinja += WriteHostCommand(parameters);
+    if (command === "Write-Var") { // TODO: change this to switch
+      
+      return "{{ " + arg1.eval() + " }}\n";
+    } else if (command == "Write-String") {
+      jinja += arg1.sourceString.slice(1, -1) + "\n";
+      return arg1.eval();
     }
   },
   CommandParameter(arg0) {
     return arg0.eval();
   },
-  CommandParameter_commandParamExp(arg0) {
-    return arg0.eval();
+  CommandParameter_commandParamLit(arg0) {
+    console.log('CommandParameter_commandParamLit', arg0.sourceString);
+    return arg0.sourceString;
   },
   CommandParameter_commandParam(arg0) {
     
@@ -125,39 +132,25 @@ semantics.addOperation<void>('eval()', {
       res[i] = child.eval();
       i ++;
     }
-    return res;
+    return res.join('');
   },
   // Statement(arg0) {
   //   console.log('Statement', arg0.sourceString);
   //   return arg0.eval();
   // },
   IterationStatement_forIn(arg0, arg1, item, arg3, items, arg5, block) {
-    console.log('arg6', block.sourceString);
+    
     jinja += `{% for ${item.eval()} in ${items.eval()} %}
-    <li>{{ ${block.eval()} }}</li>
+    ${block.eval()}
 {% endfor %}\n`;
   },
   Block(arg0, statement, arg2) {
     
-    console.log('statement', statement.sourceString, statement.eval());
     return statement.eval();
   }
 });
 
-// TODO: move out to a different file
-function WriteHostCommand(parameters: any) {
-  if(parameters) {
-    return parameters.reduce((arr: string, curr: string) => {
-      if (curr.match(/".*?"/g)) {
-        arr += curr.slice(1, -1);
-      } else {
-        arr += curr;
-      }
-      return arr;
-    }, "") + "\n";
-  }
-  return '';
-}
+
 
 export function evaluate(expr: string): number {
   const matchResult = grammar.match(expr);

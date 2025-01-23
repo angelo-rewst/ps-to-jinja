@@ -142,7 +142,7 @@ PowerShell {
               
   escape      =  "\\\\" | "\\\"" | "\\'" | "\\n" | "\\t"
   
-  expandableStringLiteral   =  "\"" (char | "\'")* "\""
+  expandableStringLiteral   =  "\"" (char)* "\""
 
   verbatimStringLiteral = "'" any* "'"
   // end following
@@ -155,7 +155,7 @@ PowerShell {
   Expression = AssignmentExpression
 
   AssignmentExpression
-    = CallExpression "=" LogicalANDExpression                                    --assignment
+    = CallExpression "=" LogicalANDExpression                             --assignment
     | LogicalANDExpression
   
   // RightSideOperation = variable | LogicalORExpression
@@ -194,11 +194,13 @@ PowerShell {
     = CommandName CommandParameter+                                       --commandExp
     | PrimaryExpression
   
-  CommandParameter = PrimaryExpression                                    --commandParamExp
+  CommandParameter = literal                                              --commandParamLit
+    | variable                                                            --commandVariable
     | ParameterName                                                       --commandParam
 
   CommandName
-    = "Write-Host"                                                        --writeHostCmd
+    = "Write-Var"                                                         --writeVarCmd
+    | "Write-String"                                                      --writeStringCmd
 
   ParameterName = "-" identifierPart
 

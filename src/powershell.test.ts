@@ -48,32 +48,25 @@ test('basic', () => {
   // assert.is(result, true);
   /*
 
-    $x = $ctx.json
-    $counter= 0
-    Write-Host "<ul>"
-    while($counter -ne 6) {
-      Write-Host "<li>" $x[$counter] "</li>"
-    }
-    Write-Host "</ul>"
+
+$items = $ctx.json\n
+Write-String "<ul>"\n
+foreach($item in $items) {
+  $show = "<li>" + $x[$counter] + "</li>"\n
+  Write-Var $show\n
+}
+Write-String "</ul>"\n
 
   */
-// evaluate(`
-// while($counter -ne 6) {
-//   Write-Host "<li>" $x[$counter] "</li>"
-// }
-//   `);
-// evaluate(`
-// foreach($item in $items) {
-//   Write-Host "<li>" $x[$counter] "</li>"
-// }
-//   `);
 
   result = evaluate(`
 $items = $ctx.json\n
-Write-Host "<ul>"\n
+Write-String "<ul>"\n
 foreach($item in $items) {
-  Write-Jinja "<li> $x[$counter] </li>"
+  $show = "<li>" + $x[$counter] + "</li>"\n
+  Write-Var $show\n
 }
+Write-String "</ul>"\n
   `.trim());
 
   console.log('result:\n', result);
