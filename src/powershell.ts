@@ -42,7 +42,8 @@ semantics.addOperation<void>('eval()', {
   },
   EqualityExpression_ne(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
-    return x !== y;
+    
+    return `${x} != ${y}`;
   },
   AdditiveExpression_add(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
@@ -81,6 +82,9 @@ semantics.addOperation<void>('eval()', {
   },
   CallExpression_propRefExp(arg0, arg1, arg2) {
     return `${arg0.eval()}.${arg2.eval()}`
+  },
+  CallExpression_arrayRefExp(arg0, arg1, arg2, arg3) {
+    return `${arg0.eval()}[${arg2.eval()}]`
   },
   variable_call(_arg0) {
     // const entity = memory[this.sourceString];
@@ -123,6 +127,21 @@ semantics.addOperation<void>('eval()', {
     }
     return res;
   },
+  // Statement(arg0) {
+  //   console.log('Statement', arg0.sourceString);
+  //   return arg0.eval();
+  // },
+  IterationStatement_forIn(arg0, arg1, item, arg3, items, arg5, block) {
+    console.log('arg6', block.sourceString);
+    jinja += `{% for ${item.eval()} in ${items.eval()} %}
+    <li>{{ ${block.eval()} }}</li>
+{% endfor %}\n`;
+  },
+  Block(arg0, statement, arg2) {
+    
+    console.log('statement', statement.sourceString, statement.eval());
+    return statement.eval();
+  }
 });
 
 // TODO: move out to a different file
@@ -135,7 +154,7 @@ function WriteHostCommand(parameters: any) {
         arr += curr;
       }
       return arr;
-    }, "");
+    }, "") + "\n";
   }
   return '';
 }

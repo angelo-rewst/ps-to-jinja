@@ -10,7 +10,7 @@ PowerShell {
   input = inputElement+
 
   inputElement
-    = whitespace | token
+    = whitespace | applySyntactic<Statement> | token
 
   space := whitespace | lineTerminator
 
@@ -205,4 +205,14 @@ PowerShell {
   PrimaryExpression = "(" Expression ")"                                  --paren
     | literal
     | variable
+
+  Statement = Block
+    | Expression
+    | IterationStatement
+
+  Block = "{" StatementList "}"
+
+  StatementList = Statement*
+
+  IterationStatement = foreach "(" variable in variable ")" Block             -- forIn
 }

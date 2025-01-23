@@ -57,11 +57,23 @@ test('basic', () => {
     Write-Host "</ul>"
 
   */
+// evaluate(`
+// while($counter -ne 6) {
+//   Write-Host "<li>" $x[$counter] "</li>"
+// }
+//   `);
+// evaluate(`
+// foreach($item in $items) {
+//   Write-Host "<li>" $x[$counter] "</li>"
+// }
+//   `);
 
   result = evaluate(`
-$x = $ctx.json\n
-$counter= 0\n
-Write-Host "<ul>"
+$items = $ctx.json\n
+Write-Host "<ul>"\n
+foreach($item in $items) {
+  Write-Jinja "<li> $x[$counter] </li>"
+}
   `.trim());
 
   console.log('result:\n', result);
