@@ -23,8 +23,20 @@ semantics.addOperation<void>('eval()', {
     return arg0.eval();
   },
   PrimaryExpression_paren(arg0, arg1, arg2) {
-    console.log(this.sourceString);
     return arg1.eval();
+  },
+  LogicalORExpression_lor(left, arg1, right) {
+    const [x, y] = [left.eval(), right.eval()];
+    
+    return x || y;
+  },
+  LogicalANDExpression_land(left, op, right) {
+    const [x, y] = [left.eval(), right.eval()];
+    return x && y;
+  },
+  EqualityExpression_eq(left, arg1, right) {
+    const [x, y] = [left.eval(), right.eval()];
+    return x == y;
   },
   AdditiveExpression_add(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
@@ -40,6 +52,9 @@ semantics.addOperation<void>('eval()', {
   },
   realLiteral(arg0, arg1, arg2, arg3, arg4, arg5) {
     return parseFloat(this.sourceString);
+  },
+  booleanLiteral(arg0) {
+    return this.sourceString == "True" ? true : false;
   },
 });
 

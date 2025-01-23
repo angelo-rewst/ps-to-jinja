@@ -44,7 +44,7 @@ PowerShell {
   identifierStart = "$"
   identifierPart = alnum+
 
-  reservedWord = keyword | nullLiteral | booleanLiteral
+  reservedWord = keyword | nullLiteral
 
   keyword = | begin         | break         | catch      | class
     | continue       | data           | define      | do
@@ -92,10 +92,11 @@ PowerShell {
   while = "while" ~identifierPart
   workflow = "workflow" ~identifierPart
 
-  literal = integerLiteral | realLiteral
+  literal = integerLiteral | realLiteral | booleanLiteral
   // TODO: complete all literal types
 
-  booleanLiteral = ("true" | "false") ~identifierPart
+  //booleanLiteral = ("true" | "false") ~identifierPart
+  booleanLiteral = "True" | "False" // TODO: automatic variable for bool ($true)
   nullLiteral = "null" ~identifierPart
 
   integerLiteral = 
@@ -143,7 +144,16 @@ PowerShell {
 
   // TODO: advanced arithmetic logic from EC5
 
-  Expression = AdditiveExpression
+  Expression = LogicalANDExpression
+
+  LogicalORExpression = LogicalORExpression "||" LogicalANDExpression     --lor
+    | LogicalANDExpression
+
+  LogicalANDExpression = LogicalANDExpression "&&" AdditiveExpression     --land
+    | EqualityExpression
+
+  EqualityExpression = EqualityExpression "==" AdditiveExpression         --eq
+    | AdditiveExpression
 
   AdditiveExpression = AdditiveExpression "+" MultiplicativeExpression    --add
     | AdditiveExpression "-" MultiplicativeExpression                     --sub
