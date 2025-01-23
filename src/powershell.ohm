@@ -144,16 +144,23 @@ PowerShell {
 
   // TODO: advanced arithmetic logic from EC5
 
-  Expression = LogicalANDExpression
+  Expression = LogicalORExpression
 
-  LogicalORExpression = LogicalORExpression "||" LogicalANDExpression     --lor
+  LogicalORExpression = LogicalORExpression orop LogicalANDExpression     --lor
     | LogicalANDExpression
 
-  LogicalANDExpression = LogicalANDExpression "&&" AdditiveExpression     --land
+  LogicalANDExpression = LogicalANDExpression andop EqualityExpression     --land
     | EqualityExpression
 
-  EqualityExpression = EqualityExpression "==" AdditiveExpression         --eq
+  EqualityExpression = EqualityExpression eqop AdditiveExpression         --eq
+    | EqualityExpression neop AdditiveExpression                          --ne
     | AdditiveExpression
+
+  orop = "||" | "-or"
+  andop = "&&" | "-and"
+
+  eqop = "==" | "-eq"
+  neop = "!=" | "-ne"
 
   AdditiveExpression = AdditiveExpression "+" MultiplicativeExpression    --add
     | AdditiveExpression "-" MultiplicativeExpression                     --sub

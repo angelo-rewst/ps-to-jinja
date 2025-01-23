@@ -36,15 +36,31 @@ semantics.addOperation<void>('eval()', {
   },
   EqualityExpression_eq(left, arg1, right) {
     const [x, y] = [left.eval(), right.eval()];
-    return x == y;
+    return x === y;
+  },
+  EqualityExpression_ne(left, arg1, right) {
+    const [x, y] = [left.eval(), right.eval()];
+    return x !== y;
   },
   AdditiveExpression_add(left, op, right) {
     const [x, y] = [left.eval(), right.eval()];
     return x + y;
   },
+  AdditiveExpression_sub(left, op, right) {
+    const [x, y] = [left.eval(), right.eval()];
+    return x - y;
+  },
   MultiplicativeExpression_mul(left, op, right) {
     const [x, o, y] = [left.eval(), op.sourceString, right.eval()];
     return x * y;
+  },
+  MultiplicativeExpression_div(left, op, right) {
+    const [x, o, y] = [left.eval(), op.sourceString, right.eval()];
+    return x / y;
+  },
+  MultiplicativeExpression_mod(left, op, right) {
+    const [x, o, y] = [left.eval(), op.sourceString, right.eval()];
+    return x % y;
   },
   integerLiteral(_arg0) {
     // return new IntegerLiteral(arg0.eval());

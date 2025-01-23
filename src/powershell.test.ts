@@ -22,11 +22,29 @@ test('basic', () => {
   result = evaluate('True && True');
   assert.is(result, true);
 
-  result = evaluate('4 == 4 && True'); // TODO: cannot do expressions on both sides
+  result = evaluate('4 == 4 && 4 == 4');
   assert.is(result, true);
 
-  result = evaluate('4 == 4 && False');
+  result = evaluate('4 == 4 && 4 == 2');
   assert.is(result, false);
+
+  result = evaluate('False || True');
+  assert.is(result, true);
+
+  result = evaluate('False || False');
+  assert.is(result, false);
+
+  result = evaluate('4 == 4 || 4 == 2');
+  assert.is(result, true);
+
+  result = evaluate('4 == 3 || 4 == 2');
+  assert.is(result, false);
+
+  result = evaluate('4 != 4');
+  assert.is(result, false);
+
+  result = evaluate('4 != 2');
+  assert.is(result, true);
 
   // result = evaluate('4 -eq 4');
   // assert.is(result, true);
